@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixca - Soporte de Retroalimentación</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --border-color: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .menu-icon:hover {
+            color: var(--primary-color);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .feedback-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .feedback-updated {
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .feedback-updated h3 {
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .feedback-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-leaf"></i> pixca
+            </div>
+            <div class="menu-icon">
+                <i class="fas fa-bars"></i>
+            </div>
+        </header>
+
+        <h1>Cultivando confianza, construyendo futuros.</h1>
+
+        <div class="feedback-form">
+            <h2>Soporte de Retroalimentación</h2>
+            <p>¿Qué retroalimentación te gustaría enviar? Ingrésala y envíala aquí.</p>
+            <form id="feedbackForm">
+                <div class="form-group">
+                    <label for="nombre">Tu Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="destinatario">Nombre del Destinatario:</label>
+                    <input type="text" id="destinatario" name="destinatario" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="retroalimentacion">Tu retroalimentación:</label>
+                    <textarea id="retroalimentacion" name="retroalimentacion" required></textarea>
+                </div>
+
+                <button type="submit">Entregar</button>
+            </form>
+
+            <div id="feedbackUpdated" class="feedback-updated" style="display: none;">
+                <h3>Retroalimentación actualizada</h3>
+                <p id="updatedFeedbackContent"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+           
+            const retroalimentacion = document.getElementById('retroalimentacion').value;
+           
+            // Make the API call
+            fetch('https://demo.gritworks.ai/api/agricollab/get-agri-response/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question: retroalimentacion
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display the API response in the textarea
+                document.getElementById('retroalimentacion').value = data.response || data.message || 'Respuesta recibida';
+                document.getElementById('feedbackUpdated').style.display = 'block';
+                document.getElementById('updatedFeedbackContent').textContent = "La retroalimentación ha sido actualizada con éxito.";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('feedbackUpdated').style.display = 'block';
+                document.getElementById('updatedFeedbackContent').textContent = 'Error al procesar la retroalimentación';
+            });
+           
+            // Clear the name and recipient fields
+            document.getElementById('nombre').value = '';
+            document.getElementById('destinatario').value = '';
+        });
+    </script>
+</body>
+</html>
+
